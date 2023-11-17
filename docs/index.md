@@ -1,10 +1,28 @@
-## Welcome to GitHub Pages
+## Meeting Notes
+- [November 11th, 2023](./meeting_notes/nov_11_2023.md)
+- [November 16th, 2023](./meeting_notes/nov_16_2023.md)
 
-You can use the [editor on GitHub](https://github.com/Manuel83/sample/edit/master/index.md) to maintain and preview the content for your website in Markdown files.
+## Resources
 
-Whenever you commit to this repository, GitHub Pages will run [Jekyll](https://jekyllrb.com/) to rebuild the pages in your site, from the content in your Markdown files.
+### QKD
 
-### Markdown
+- [BB84 algorithm explanation video](https://www.youtube.com/watch?v=2kdRuqvIaww)
+- [Qiskit textbook](https://learning.quantum-computing.ibm.com/catalog)
+- [Qiskit QKD tutorial](https://learn.qiskit.org/course/ch-algorithms/quantum-key-distribution)
+- [Quantum computing with pennylane](https://pennylane.ai/qml/quantum-computing/)
+- [Pennylane coding challenges](https://pennylane.ai/challenges/)
+- [Musty Thoughs blog](https://www.mustythoughts.com)
+
+### Python Networking
+
+- [LAN socket connection using pyhton](https://www.siglenteu.com/application-note/open-socket-lan-connection-using-python/)
+- [Socket programming in python](https://realpython.com/python-sockets/)
+
+### SSH
+- [Intro to ssh communication](https://www.youtube.com/watch?v=5JvLV2-ngCI)
+
+
+## How to use Markdown
 
 Markdown is a lightweight and easy-to-use syntax for styling your writing. It includes conventions for
 
@@ -27,11 +45,3 @@ Syntax highlighted code block
 ```
 
 For more details see [GitHub Flavored Markdown](https://guides.github.com/features/mastering-markdown/).
-
-### Jekyll Themes
-
-Your Pages site will use the layout and styles from the Jekyll theme you have selected in your [repository settings](https://github.com/Manuel83/sample/settings). The name of this theme is saved in the Jekyll `_config.yml` configuration file.
-
-### Support or Contact
-
-Having trouble with Pages? Check out our [documentation](https://help.github.com/categories/github-pages-basics/) or [contact support](https://github.com/contact) and we’ll help you sort it out.
