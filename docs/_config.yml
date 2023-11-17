@@ -1,6 +1,6 @@
 language: english
 
-theme: jekyll-theme-minimal
+theme: just-the-docs
 
 format: web
 
