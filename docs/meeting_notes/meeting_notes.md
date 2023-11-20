@@ -6,4 +6,3 @@ permalink: docs/meeting_notes
 ---
 
 # Meeting Notes
-{: .no_toc }
