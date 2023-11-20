@@ -7,6 +7,7 @@ layout: home
 ## Meeting Notes
 - [November 11th, 2023](./meeting_notes/nov_11_2023.md)
 - [November 16th, 2023](./meeting_notes/nov_16_2023.md)
+- [November 23rd, 2023](./meeting_notes/nov_23_2023.md)
 
 ## Resources
 
