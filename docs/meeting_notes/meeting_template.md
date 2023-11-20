@@ -1,8 +1,8 @@
 ---
-title: date
+title: Template
 layout: default
 nav_exclude: true
-parent: meeting_notes
+parent: Meeting Notes
 ---
 
 {: .no_toc }
