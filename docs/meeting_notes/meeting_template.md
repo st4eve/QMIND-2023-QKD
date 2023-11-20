@@ -7,13 +7,13 @@
 
 ## Attendees
 People who attended: 
-- [] Tristan Austin
-- [] Keon Lee
-- [] Ben Graham
-- [] Sid Prabahran
-- [] Jacob Antonius
-- [] Duncan Genge
-- [] Max Kang
+- [ ] Tristan Austin
+- [ ] Keon Lee
+- [ ] Ben Graham
+- [ ] Sid Prabahran
+- [ ] Jacob Antonius
+- [ ] Duncan Genge
+- [ ] Max Kang
 - 
 
 ## Agenda Items
