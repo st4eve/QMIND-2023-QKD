@@ -5,7 +5,7 @@ nav_exclude: true
 parent: meeting_notes
 ---
 
-{: .no_toc}
+{: .no_toc }
 
 # Meeting Minutes
 ## Meeting Information

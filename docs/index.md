@@ -4,9 +4,9 @@ layout: home
 permalink: /docs
 nav_order: 1
 ---
-{: .no_toc}
+{: .no_toc }
 
-{:toc}
+{:toc }
 
 ## Meeting Notes
 - [November 11th, 2023](./meeting_notes/nov_11_2023.md)
