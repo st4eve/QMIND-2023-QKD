@@ -1,3 +1,8 @@
+---
+title: date
+layout: default
+---
+
 # Meeting Minutes
 ## Meeting Information
 **Meeting Date/Time:** meeting_date, meeting_time  
