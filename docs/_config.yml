@@ -1,8 +1,8 @@
 language: english
 
-remote_theme: pages-themes/hacker@v0.2.0
-plugins:
-- jekyll-remote-theme 
+theme: just-the-docs
+
+url: https://st4eve.github.io/QMIND-2023-QKD/
 
 format: web
 
