@@ -4,8 +4,6 @@ layout: home
 permalink: /docs
 nav_order: 1
 ---
-{: .no_toc }
-
 {:toc }
 
 ## Meeting Notes

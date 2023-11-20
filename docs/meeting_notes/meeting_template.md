@@ -1,7 +1,7 @@
 ---
 title: Template
 layout: default
-nav_exclude: true
+nav_exclude: false
 parent: Meeting Notes
 ---
 
