@@ -1,7 +1,11 @@
 ---
 title: date
 layout: default
+nav_exclude: true
+parent: meeting_notes
 ---
+
+{: .no_toc}
 
 # Meeting Minutes
 ## Meeting Information

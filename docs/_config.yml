@@ -4,6 +4,8 @@ theme: just-the-docs
 
 url: https://st4eve.github.io/QMIND-2023-QKD/
 
+color_scheme: dark
+
 format: web
 
 # use text title instead. text title read from uistring.title in ui strings section.
