@@ -2,7 +2,7 @@ language: english
 
 theme: just-the-docs
 
-url: https://st4eve.github.io/QMIND-2023-QKD/
+#url: https://st4eve.github.io/QMIND-2023-QKD/
 
 color_scheme: dark
 
@@ -78,45 +78,6 @@ exclude:
 # the image include will insert this path before the image file name and will also add a /.
 image_path: images
 audio_path: audio
-
-############# DEFAULTS #############
-# you can define default frontmatter values here. you can narrow the type down with subfolders (e.g., docs/myfolder).
-# you might want to list your sidebar and product as default frontmatter values
-# with translation, change topnav, footer (and sidebar) to use topnav_ja, footer_ja, generic_ja etc. for Japanese, or _de for german. you must have corresponding
-# data files with those _ja or _de file names. Read more in jekyllhowto-localization.html.
-defaults:
-  -
-    scope:
-      path: ""
-      type: pages
-    values:
-      layout: default
-      topnav: topnav
-      footer: footer
-  -
-    scope:
-      path: ""
-      type: docs
-    values:
-      layout: default
-      topnav: topnav
-      footer: footer
-  -
-    scope:
-      path: ""
-      type: search
-    values:
-      layout: default
-      topnav: topnav
-      footer: footer
-      type: search
-      sidebar: jekyllhowto
-
-  -
-    scope:
-      path: "images"
-    values:
-      image: true
 
 ############# COMMENTS #############
 # show Disqus comments after pages
