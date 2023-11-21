@@ -1,17 +1,20 @@
 ---
+
 title: Template
 layout: default
 nav_exclude: false
 parent: Meeting Notes
+
 ---
 
 
 # Meeting Minutes
 ## Meeting Information
-**Meeting Date/Time:** meeting_date, meeting_time  
-**Meeting Purpose:** QMIND Weekly Meeting
-**Meeting Location:** BMH
-**Note Taker:** note_taker  
+
+**Meeting Date/Time:** meeting_date, meeting_time <br>
+**Meeting Purpose:** QMIND Weekly Meeting <br>
+**Meeting Location:** BMH <br>
+**Note Taker:** note_taker <br>
 
 ## Attendees
 People who attended: 
@@ -32,12 +35,14 @@ Presentation | • Team member presents on topic
 Plan for next week | • Discuss the goals for next week meeting
 
 ## Discussion Items
+
 Item | Who | Notes |
 ---- | ---- | ---- |
 item | who | notes |
 
 
 ## Action Items
+
 | Done? | Item | Responsible | Due Date |
 | ---- | ---- | ---- | ---- |
 | | item | who | due_date |

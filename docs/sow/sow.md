@@ -7,5 +7,5 @@ layout: default
 
 ---
 
-<iframe src="./QMIND_SOW_2023.pdf" width="850px" height="900px" /></iframe>
+<iframe src="/sow/QMIND_SOW_2023.pdf" width="850px" height="900px" /></iframe>
 

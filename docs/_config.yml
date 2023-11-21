@@ -3,6 +3,8 @@ title: QMIND SSH QKD
 theme: just-the-docs
 description: Meeting notes and documentation for QKD ssh key generation project
 
+  #baseurl: /QMIND-2023-QKD
+
 url: https://st4eve.github.io/QMIND-2023-QKD/
 
 color_scheme: dark
