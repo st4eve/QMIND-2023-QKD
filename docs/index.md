@@ -1,6 +1,10 @@
 ---
+
 title: Home
 layout: home
+navbar: 1
+permalink: /
+
 ---
 
 ## Meeting Notes
