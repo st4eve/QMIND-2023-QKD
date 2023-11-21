@@ -7,12 +7,23 @@ permalink: /
 
 ---
 
+Welcome to the QSSH (Quantum Secure Shell Protocol) project. For an overview of the goals please start with the [Statement of Work](./sow/sow.md). 
+
+**Goal:** To demonstrate the power of quantum communication through the generation of identity confirming and dat encrypting keys.
+
+Alice and Bob want to communicate secretly. To do so they need a secure key to encode their message and verify each other's identities in the future. However, Eve, who has nefarious intent, wants to eavesdrop. Through the use of QKD Alice and Bob can generate a key that Eve will never be able to crack ensuring their communication is 100% secure. Thr goal of QSSH is to guarantee secure communication between a user and a server. 
+
 ## Meeting Notes
+**Meeting Time: Thursday at 20:00**
+
 - [November 11th, 2023](./meeting_notes/nov_11_2023.md)
 - [November 16th, 2023](./meeting_notes/nov_16_2023.md)
 - [November 23rd, 2023](./meeting_notes/nov_23_2023.md)
 
 ## Resources
+Compiled below are some resources to learn about topics in the project. 
+
+In [QKD](#QKD) there are several resources for learning about quantum key distribution and quantum computing. For an up to date universal explanation of all things quantum I recommend _Musty Thoughts_. In [Python Networking](#Python Networking) there are resources for basic communication in python. In [SSH](#SSH) there is an explanation of the SSH algorithm.
 
 ### QKD
 
