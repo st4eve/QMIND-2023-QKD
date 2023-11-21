@@ -7,7 +7,7 @@ permalink: /
 
 ---
 
-Welcome to the QSSH (Quantum Secure Shell Protocol) project. For an overview of the goals please start with the [Statement of Work]({{ site.url }}/sow/sow.html). 
+Welcome to the QSSH (Quantum Secure Shell Protocol) project. For an overview of the goals please start with the [Statement of Work]({{ site.url }}/sow/). 
 
 **Goal:** To demonstrate the power of quantum communication through the generation of identity confirming and dat encrypting keys.
 
@@ -23,7 +23,7 @@ Alice and Bob want to communicate secretly. To do so they need a secure key to e
 ## Resources
 Compiled below are some resources to learn about topics in the project. 
 
-In [QKD](#QKD) there are several resources for learning about quantum key distribution and quantum computing. For an up to date universal explanation of all things quantum I recommend _Musty Thoughts_. In [Python Networking](#Python Networking) there are resources for basic communication in python. In [SSH](#SSH) there is an explanation of the SSH algorithm.
+In [QKD]({{ site.url }}/#qkd) there are several resources for learning about quantum key distribution and quantum computing. For an up to date universal explanation of all things quantum I recommend _Musty Thoughts_. In [Python Networking](#python-networking) there are resources for basic communication in python. In [SSH](#ssh) there is an explanation of the SSH algorithm.
 
 ### QKD
 
