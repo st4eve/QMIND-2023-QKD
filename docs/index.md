@@ -1,8 +1,6 @@
 ---
 title: Home
 layout: home
-permalink: /docs
-nav_order: 1
 ---
 
 ## Meeting Notes
