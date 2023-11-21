@@ -22,14 +22,14 @@ People who attended:
 - [ ] Jacob Antonius
 - [ ] Duncan Genge
 - [ ] Max Kang
-- 
 
 ## Agenda Items
 
 Item | Description
 ---- | ----
-Agenda Item 1 | • <br>• <br>• <br>• <br>• 
-Agenda Item 2 | • <br>• <br>• <br>• <br>• 
+Round Table | • Progress this week?<br>• Anything stopping progress?<br>• Help required?
+Presentation | • Team member presents on topic 
+Plan for next week | • Discuss the goals for next week meeting
 
 ## Discussion Items
 Item | Who | Notes |

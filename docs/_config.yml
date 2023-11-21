@@ -2,9 +2,10 @@ language: english
 title: QMIND SSH QKD
 theme: just-the-docs
 description: Meeting notes and documentation for QKD ssh key generation project
+
 url: https://st4eve.github.io/QMIND-2023-QKD/
 
-#color_scheme: dark
+color_scheme: dark
 
 format: web
 
