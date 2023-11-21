@@ -7,5 +7,5 @@ layout: default
 
 ---
 
-<object data="QMIND_SOW_2023.pdf" width="1000" height="1000" type='application/pdf'/></object>
+<iframe src="./QMIND_SOW_2023.pdf" width="850px" height="900px" /></iframe>
 
