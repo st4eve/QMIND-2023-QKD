@@ -16,9 +16,9 @@ Alice and Bob want to communicate secretly. To do so they need a secure key to e
 ## Meeting Notes
 **Meeting Time:** Thursday at 20:00
 
-- [November 11th, 2023](./meeting_notes/nov_11_2023.md)
-- [November 16th, 2023](./meeting_notes/nov_16_2023.md)
-- [November 23rd, 2023](./meeting_notes/nov_23_2023.md)
+- [November 11th, 2023]({{ site.url }}/meeting_notes/nov_11_2023.html)
+- [November 16th, 2023]({{ site.url }}/meeting_notes/nov_16_2023.html)
+- [November 23rd, 2023]({{ site.url }}/meeting_notes/nov_23_2023.html)
 
 ## Resources
 Compiled below are some resources to learn about topics in the project. 
