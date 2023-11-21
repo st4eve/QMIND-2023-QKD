@@ -2,7 +2,7 @@
 
 title: Home
 layout: home
-navbar: 1
+nav_order: 1
 permalink: /
 
 ---

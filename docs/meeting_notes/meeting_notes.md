@@ -3,8 +3,8 @@
 layout: default
 title: Meeting Notes
 has_children: true
-permalink: docs/meeting_notes
-navbar: 2
+permalink: /meeting_notes
+nav_order: 2
 
 ---
 
