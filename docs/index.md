@@ -7,7 +7,7 @@ permalink: /
 
 ---
 
-Welcome to the QSSH (Quantum Secure Shell Protocol) project. For an overview of the goals please start with the [Statement of Work](./sow/sow.md). 
+Welcome to the QSSH (Quantum Secure Shell Protocol) project. For an overview of the goals please start with the [Statement of Work]({{ site.url }}/sow/sow.html). 
 
 **Goal:** To demonstrate the power of quantum communication through the generation of identity confirming and dat encrypting keys.
 
