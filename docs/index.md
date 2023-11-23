@@ -13,7 +13,7 @@ Welcome to the QSSH (Quantum Secure Shell Protocol) project. For an overview of 
 
 Alice and Bob want to communicate secretly. To do so they need a secure key to encode their message and verify each other's identities in the future. However, Eve, who has nefarious intent, wants to eavesdrop. Through the use of QKD Alice and Bob can generate a key that Eve will never be able to crack ensuring their communication is 100% secure. The goal of QSSH is to guarantee secure communication between a user and a server. 
 
-__Not sure what to be working one__: check the [projects page](https://github.com/users/st4eve/projects/1/views/3?layout=table)
+__Not sure what to be working on__: check the [projects page](https://github.com/users/st4eve/projects/1/views/3?layout=table)
 
 ## Meeting Notes
 **Meeting Time:** Thursday at 20:00
