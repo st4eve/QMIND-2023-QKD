@@ -21,6 +21,7 @@ __Not sure what to be working on__: check the [projects page](https://github.com
 - [November 11th, 2023]({{ site.url }}/meeting_notes/nov_11_2023.html)
 - [November 16th, 2023]({{ site.url }}/meeting_notes/nov_16_2023.html)
 - [November 23rd, 2023]({{ site.url }}/meeting_notes/nov_23_2023.html)
+- [November 30th, 2023]({{ site.url }}/meeting_notes/nov_30_2023.html)
 
 ## Resources
 Compiled below are some resources to learn about topics in the project. 
