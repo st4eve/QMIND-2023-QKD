@@ -27,6 +27,17 @@ def send_bits(bits, seed, basis_override):
 def send_basis():
     print(f"Sending basis to Bob")
 
+@app.command()
+@click.option("--string", default="Test String", help="String to send to Alice using AES")
+def send_encrypted_string(string):
+    # TODO: Need to verify that key has been established using send_bits, send_basis.
+    print(f"Sending {string} to Bob using AES encryption")
+
+@app.command()
+@click.option("--file_path", help="Path to file to send to Alice using AES")
+def send_encrypted_file(file_path):
+    # TODO: Need to verify that key has been established using send_bits, send_basis.
+    print(f"Sending {file_path} to Bob using AES encryption")
 
 if __name__ == "__main__":
     app()
