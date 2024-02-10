@@ -5,7 +5,7 @@ from qiskit.tools.visualization import plot_histogram
 
 # Assigning registors for qubits
 
-n = 20 #max is 23 for some reason
+n = 5 #max is 23 for some reason
 
 #Assigning registors for quantum and classical circuit
 qr = QuantumRegister(n, name = 'qr')
@@ -65,4 +65,19 @@ def SendState(qc1, qc2, qc1_name):
 bob = QuantumCircuit(qr, cr, name = 'Bob')
 
 SendState(alice, bob, 'Alice')
+
+#TEST CASE
+# Add measurement operations to the circuits
+alice.measure(qr, cr)
+bob.measure(qr, cr)
+
+# Execute the circuits on a quantum simulator
+simulator = BasicAer.get_backend('qasm_simulator')
+alice_result = execute(alice, simulator).result()
+bob_result = execute(bob, simulator).result()   
+
+# Print the results
+print("Alice's results:", alice_result.get_counts())
+print("Bob's results:", bob_result.get_counts())
+
 
