@@ -1,6 +1,6 @@
 import qiskit
 import numpy as np
-from qiskit import QuantumCircuit, ClassicalRegister, QuantumRegister, execute, BasicAer
+from qiskit import QuantumCircuit, ClassicalRegister, QuantumRegister, execute, Aer
 from qiskit.tools.visualization import plot_histogram
 
 class QuantumCircuitObject:
@@ -9,8 +9,7 @@ class QuantumCircuitObject:
         self.qr = QuantumRegister(n, name = 'qr')
         self.cr = ClassicalRegister(n, name = 'cr')
         self.circuit = QuantumCircuit(self.qr, self.cr, name = name)
-        self.key = np.random.randint(0, high = 2 ** n)
-        self.key = np.binary_repr(self.key, n)
+        self.key = np.random.randint(0, high = 1, size=n)
         self.qubits = []
         self.same_basis_bits = []
         self.measurement_result = []
@@ -57,7 +56,7 @@ class QuantumCircuitObject:
 
     def measure_qubits(self):
         self.circuit.measure(self.qr, self.cr)
-        simulator = BasicAer.get_backend('qasm_simulator')
+        simulator = Aer.get_backend('aer_simulator_matrix_product_state')
         result = execute(self.circuit, simulator).result()
         counts = result.get_counts(self.circuit)
         # Get the most common result
@@ -87,7 +86,7 @@ bob.remove_garbage(same_qubits)
 #TEST CASE
 def test_QuantumCircuitObject_send_and_compare():
     # Initialize Alice's circuit with 10 quantum bits
-    n = 10
+    n = 63
     alice = QuantumCircuitObject(n, 'Alice')
     
     # Encode the key in Alice's circuit
@@ -126,6 +125,8 @@ def test_QuantumCircuitObject_send_and_compare():
 
     # Print the results
     print("Quantum bits that Bob got correctly: ", bob.same_basis_bits)
+    print(bob.key)
 
-test_QuantumCircuitObject_send_and_compare()
+if __name__ == "__main__":
+    test_QuantumCircuitObject_send_and_compare()
 

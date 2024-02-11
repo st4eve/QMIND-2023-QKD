@@ -36,8 +36,7 @@ class Bob():
                 message[q].measure(0,0)
 
             # Runs simulation of the  quantum circuit
-            aer_sim = Aer.get_backend('aer_simulator')  
-            results = aer_sim.run(message[q], shots=1, memory=True).result()
+            results = backend.run(message[q], shots=1, memory=True).result()
             
             # Gets the results from the simulation and converts it to an integer
             measured_bit = int(results.get_memory()[0])
