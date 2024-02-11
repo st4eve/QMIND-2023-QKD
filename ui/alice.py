@@ -1,6 +1,7 @@
 import click
 from rich.progress import Progress
 import time
+import socket
 
 @click.group()
 def app():
@@ -32,6 +33,12 @@ def send_basis():
 def send_encrypted_string(string):
     # TODO: Need to verify that key has been established using send_bits, send_basis.
     print(f"Sending {string} to Bob using AES encryption")
+    s = socket.socket()
+    s.connect(('localhost', 65432))
+    s.sendall(b"Hello world")
+    data = s.recv(1024)
+    print(f"Recieved: {data}")
+
 
 @app.command()
 @click.option("--file_path", help="Path to file to send to Alice using AES")
