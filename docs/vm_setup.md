@@ -1,3 +1,12 @@
+---
+
+title: VM Setup
+layout: default
+nav_order: 3
+permalink: /
+
+---
+
 # VM Setup
 For this project we will use three different virtual machines to simulate Alice, Bob, and Eve. Alice and Bob will use the Ubuntu Linux OS while Eve will use Kali Linux OS. To start download virtual box using this [link](https://www.virtualbox.org/wiki/Downloads). 
 ### Alice and Bob
