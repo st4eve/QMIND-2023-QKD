@@ -22,6 +22,10 @@ __Not sure what to be working on__: check the [projects page](https://github.com
 - [November 16th, 2023]({{ site.url }}/meeting_notes/nov_16_2023.html)
 - [November 23rd, 2023]({{ site.url }}/meeting_notes/nov_23_2023.html)
 - [November 30th, 2023]({{ site.url }}/meeting_notes/nov_30_2023.html)
+- [January 21st, 2024]({{ site.url }}/meeting_notes/jan_21_2024.html)
+- [January 28th, 2024]({{ site.url }}/meeting_notes/jan_28_2024.html)
+- [February 4th, 2024]({{ site.url }}/meeting_notes/feb_4_2024.html)
+- [February 18th, 2024]({{ site.url }}/meeting_notes/feb_18_2024.html)
 
 ## Resources
 Compiled below are some resources to learn about topics in the project. 
@@ -45,4 +49,5 @@ In [QKD]({{ site.url }}/#qkd) there are several resources for learning about qua
 ### SSH
 - [Intro to ssh communication](https://www.youtube.com/watch?v=5JvLV2-ngCI)
 
-
+### Setting up VMs
+- [Setting up a VM]({{site.url}}/vm_setup.html)
