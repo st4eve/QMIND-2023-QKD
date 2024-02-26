@@ -2,6 +2,11 @@ import click
 from rich.progress import Progress
 import time
 import socket
+from encryption.aes_encryption import *
+import pickle
+import os
+
+key = b'\xb2 \xb9\x0bC\xb9H\x93\xf5\x85U\x84_-\xcc%' # Global key, to be updated by QKD methods
 
 @click.group()
 def app():
@@ -33,18 +38,30 @@ def send_basis():
 def send_encrypted_string(string):
     # TODO: Need to verify that key has been established using send_bits, send_basis.
     print(f"Sending {string} to Bob using AES encryption")
+
+    cypher_text, tag, nonce = encrypt(string.encode("ascii"), key)
+    data = {'type': 'string', "cypher_text" : cypher_text, "tag" : tag, "nonce" : nonce}
     s = socket.socket()
     s.connect(('localhost', 65432))
-    s.sendall(b"Hello world")
-    data = s.recv(1024)
-    print(f"Recieved: {data}")
+    s.sendall(pickle.dumps(data))
+    s.close()
 
 
 @app.command()
-@click.option("--file_path", help="Path to file to send to Alice using AES")
+@click.option("--file_path", default='./test_folder/test.txt', help="Path to file to send to Alice using AES")
 def send_encrypted_file(file_path):
     # TODO: Need to verify that key has been established using send_bits, send_basis.
     print(f"Sending {file_path} to Bob using AES encryption")
+
+    file = open(file_path, "r")
+    file_text = file.read()
+    cypher_text, tag, nonce = encrypt(file_text.encode("ascii"), key)
+    data = {"type": 'file', 'filename': f'{os.path.split(file_path)[-1]}', "cypher_text": cypher_text, "tag": tag, "nonce": nonce}
+    s = socket.socket()
+    s.connect(('localhost', 65432))
+    s.sendall(pickle.dumps(data))
+    s.close()
+
 
 if __name__ == "__main__":
     app()
