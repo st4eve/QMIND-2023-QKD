@@ -1,5 +1,9 @@
 import click
 import socket
+from encryption.aes_encryption import *
+import pickle
+
+key = b'\xb2 \xb9\x0bC\xb9H\x93\xf5\x85U\x84_-\xcc%' # Global key, to be updated by QKD methods
 
 @click.group()
 def app():
@@ -25,11 +29,18 @@ def monitor_for_encrypted():
     conn, addr = s.accept()
     with conn:
         print(f"Connected by {addr}")
-        while True:
-            data = conn.recv(1024)
-            if not data:
-                break
-            print(data)
+        raw_data = []
+        try:
+            while True:
+                d = conn.recv(1024)
+                if not d:
+                    break
+                raw_data.append(d)
+            encrypt_data = pickle.loads(b"".join(raw_data))
+            unencrypt_data = decrypt(encrypt_data["cypher_text"], encrypt_data["tag"], encrypt_data["nonce"], key)
+            print(unencrypt_data)
+        except KeyboardInterrupt:
+            print("Exiting...")
 
 if __name__ == "__main__":
     app()
