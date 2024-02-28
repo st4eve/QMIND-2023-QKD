@@ -42,9 +42,9 @@ def monitor_for_encrypted():
                 file = open(f'./{encrypt_data["filename"]}', "w")
                 file.write(unencrypt_data.decode("ascii"))
                 file.close()
-                print(f"File received and saved to ./test_folder/{encrypt_data['filename']}")
+                print(f"File received and saved to ./{encrypt_data['filename']}")
             elif encrypt_data["type"] == 'string':
-                print(f"String received: {unencrypt_data.decode('ascii')}") 
+                print(f"String received: {unencrypt_data.decode('ascii')}")
         except KeyboardInterrupt:
             print("Exiting...")
 
