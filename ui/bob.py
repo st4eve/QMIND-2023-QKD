@@ -20,6 +20,16 @@ def monitor(seed, basis_override):
         print(f"Monitoring for bits from Alice in basis {basis_override}")
 
 @app.command()
+def monitor_for_qc():
+    pass
+
+
+@app.command()
+def send_basis_used():
+    pass
+    #bob = Bob()
+
+@app.command()
 def monitor_for_encrypted():
     # TODO:  Need to verify that key has been established (bits and basis have already been received from Alice)
     print("Monitoring for AES encrypted data from Alice")
