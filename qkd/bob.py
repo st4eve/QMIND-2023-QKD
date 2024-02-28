@@ -6,21 +6,18 @@ import copy
 
 class Bob():
     def __init__(self, 
-                 qc_alice, 
-                 minComparisonLen):
+                 qc_alice,
+                 verbose=0):
         # Creates copy of Alice quantum circuit
         self.qc = copy.deepcopy(qc_alice)
+
+        self.verbose = verbose
         
         # Determines the number of qubits in quantum circuit
         self.num_qubits = len(self.qc) 
+        self.n = self.num_qubits//4
         
-        # Checks if the comparison length is more than amount of qubits
-        if self.num_qubits//4 < minComparisonLen:
-            # Throws execption
-            raise Exception("Comparison length must be shorter than the message.")  
-        else:
-            self.minComparisonLen = minComparisonLen
-        
+        self.comparisonLength = self.num_qubits//4
         # Create bases for bob
         self.bases = ['X' if randint(0, 2) else 'H' for i in range(self.num_qubits)]
         self.measure_message(self.qc)
@@ -55,20 +52,21 @@ class Bob():
         self.bobMeasurement = measurements
     
     def remove_garbagebits(self, aliceBases):
-
         kept_bits = [self.bobMeasurement[i] for i in aliceBases]
-        print('Bobs measurements: ', self.bobMeasurement)
-        print("Bobs Kept bits: ", kept_bits)
-        self.comparisonLength = len(kept_bits) - self.num_qubits//4
-        if self.comparisonLength < self.minComparisonLen:
-            raise Exception("Insufficient comparison bits")
+        if self.verbose:
+            print('Bobs measurements: ', self.bobMeasurement)
+            print("Bobs Kept bits: ", kept_bits)
+        
+
         # Stores the key 
-        self.key = kept_bits[self.comparisonLength:]
+        self.key = kept_bits[self.comparisonLength:self.n]
         
         # Stores the qubits to be compared
         self.comparisonKey = kept_bits[:self.comparisonLength]
         
     def check_eve(self, aliceCompareKey):
+        if self.verbose: 
+            print('Bob comparison key:', self.comparisonKey)
         # Compare length of alice comparison key to bob comparison key
         if len(aliceCompareKey) != len(self.comparisonKey):
             raise Exception("Comparsion keys are not the same length")
@@ -83,7 +81,6 @@ class Bob():
         
         # Calculate percent of same bases
         percentageSame = (sameBases / len(aliceCompareKey)) * 100
-        print(percentageSame)
         
         # Print message
         if percentageSame < 75.0:
@@ -104,15 +101,17 @@ class Bob():
     def get_comparisonkey(self):
         return self.comparisonKey
     
+    def get_circuit(self):
+        return self.qc 
+ 
 if __name__ == '__main__':
     print('Bob class file')
     # Create Alice object
-    alice = Alice(32, verbose=0)
+    alice = Alice(128, verbose=0)
     # Create Bob object
-    bob = Bob(alice.get_circuit(), 4)
-    print(alice.get_circuit()[0].draw())
-    print(bob.qc[0].draw())
+    bob = Bob(alice.get_circuit(), verbose=0)
+
     same_bases = alice.process_bases(bob.get_bases())
     bob.remove_garbagebits(same_bases)
-    compare_key = alice.get_comparison_key(bob.comparisonLength)
+    compare_key = alice.get_comparison_key()
     bob.check_eve(compare_key)

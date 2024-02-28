@@ -8,10 +8,11 @@ class Alice:
                  n,
                  verbose=0):
         self.n = n
-        self.circuit = [QuantumCircuit(1,1) for i in range(n)]
-        self.key = np.random.randint(0, 2, size=n)
+        self.circuit = [QuantumCircuit(1,1) for i in range(4*n)]
+        self.key = np.random.randint(0, 2, size=4*n)
         self.bases = []
         self.verbose = verbose
+        self.comparison_length = n
         
         
         self.encode_key()
@@ -39,7 +40,7 @@ class Alice:
 
     def process_bases(self, bob_bases):
         matching_bases = [i for i, (alice_base, bob_base) in enumerate(zip(self.bases, bob_bases)) if alice_base == bob_base]
-        self.bob_matching_bases = matching_bases
+        self.matching_bases = matching_bases
         if self.verbose:
             print("Matching bases index:", matching_bases)
             print('Matching bases values:', [self.bases[i] for i in matching_bases])
@@ -47,17 +48,17 @@ class Alice:
         return matching_bases
 
     def generate_key(self):
-        generated_key = ''.join([str(self.key[i]) for i in self.bob_matching_bases])
+        self.generated_key = [self.key[i] for i in self.matching_bases]
         if self.verbose:
-            print("Length of Generated key:", len(generated_key))
-            print('Generated key:', generated_key)
-        return generated_key
+            print("Length of Generated key:", len(self.generated_key))
+            print('Generated key:', self.generated_key)
+        return self.generated_key
 
-    def get_comparison_key(self, comparisonLength):
-        self.comparison_key = self.key[:comparisonLength]
-        self.key = self.key[comparisonLength:]
+    def get_comparison_key(self):
+        self.comparison_key = self.generated_key[:self.comparison_length]
+        self.generated_key = self.generated_key[self.comparison_length:self.n]
         if self.verbose:
-            print("Key part:", self.comparison_key)
+            print("Alice Comparison Key:", self.comparison_key)
         return self.comparison_key
 
 
@@ -76,6 +77,6 @@ if __name__ == '__main__':
     #Random bob circuit for testing
     bob_bases = ['X' if 0.5 < np.random.random() else 'H' for i in range(n)]
     matching_bases = alice.process_bases(bob_bases)
-    generated_key = alice.generate_key(matching_bases)
-    key_part = alice.get_key_part(np.abs(len(generated_key)-128))
+    key_part = alice.get_comparison_key(np.abs(len(alice.generated_key)-128))
+    print(key_part)
 
