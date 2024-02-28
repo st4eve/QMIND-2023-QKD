@@ -28,6 +28,9 @@ You then must send Bob the basis you used to generate the bits.
 Once the key setup is complete, you can communicate with Bob.
 """
 
+endSetupKeyModeMethods = ['send_basis']
+userExecutedMethods = []
+
 def cls():
     os.system('cls' if os.name == 'nt' else 'clear')
 
@@ -130,8 +133,8 @@ def main():
     # Configure autocomplete for keywords
     auto_completer = WordCompleter(menu_keywords, ignore_case=True)
     session = PromptSession(completer=auto_completer)
-
-    while True:
+    setupKeyMode = True
+    while setupKeyMode:
         try:
             text = session.prompt('> ')
         except KeyboardInterrupt:
@@ -141,6 +144,9 @@ def main():
 
         try:
             menu_keyword_to_method[text]()
+            if len(userExecutedMethods) == 1:
+                if userExecutedMethods[0] == endSetupKeyModeMethods[0]:
+                    setupKeyMode = False
         except KeyError:
             print("Invalid Input!")
 
