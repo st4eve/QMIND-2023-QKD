@@ -42,7 +42,7 @@ def send_encrypted_string(string):
     cypher_text, tag, nonce = encrypt(string.encode("ascii"), key)
     data = {'type': 'string', "cypher_text" : cypher_text, "tag" : tag, "nonce" : nonce}
     s = socket.socket()
-    s.connect(('localhost', 65432))
+    s.connect(('localhost', 65433))
     s.sendall(pickle.dumps(data))
     s.close()
 
