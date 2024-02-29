@@ -6,6 +6,8 @@ from encryption.aes_encryption import *
 import pickle
 import os
 
+from qkd.alice import Alice
+
 key = b'\xb2 \xb9\x0bC\xb9H\x93\xf5\x85U\x84_-\xcc%' # Global key, to be updated by QKD methods
 
 @click.group()
@@ -23,11 +25,21 @@ def send_bits(bits, seed, basis_override):
     else:
         print(f"Sending {bits} to Bob in basis {basis_override}")
 
+
+
+
     with Progress() as progress:
         task1 = progress.add_task("[red]Sending bits to Bob...", total=50)
         while not progress.finished:
             progress.update(task1, advance=0.5)
             time.sleep(0.02)
+
+
+@app.command()
+def send_qc():
+    data = {'type': 'qc', 'circuit': Alice(128, verbose=0).get_circuit()}
+    socket_send(data)
+
 
 @app.command()
 def send_basis():
@@ -62,6 +74,11 @@ def send_encrypted_file(file_path):
     s.sendall(pickle.dumps(data))
     s.close()
 
+def socket_send(data):
+    s = socket.socket()
+    s.connect(('localhost', 65432))
+    s.sendall(pickle.dumps(data))
+    s.close()
 
 if __name__ == "__main__":
     app()
