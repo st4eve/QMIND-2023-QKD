@@ -7,10 +7,13 @@ from prompt_toolkit.completion import WordCompleter
 from rich.progress import Progress
 import os
 
-from encryption.aes_encryption import encrypt
+from encryption.aes_encryption import encrypt, decrypt
 from qkd.alice import Alice
 
+from selectors import DefaultSelector
+
 key = b'\xb2 \xb9\x0bC\xb9H\x93\xf5\x85U\x84_-\xcc%'
+key = None
 
 alice = Alice(128, verbose=0)
 
@@ -30,6 +33,8 @@ Once the key setup is complete, you can communicate with Bob.
 endSetupKeyModeMethods = ['send_qc',
                           'send_basis']
 userExecutedMethods = []
+
+sel = DefaultSelector()
 
 def convert_key(key):
     # Convert binary string to an integer
@@ -83,17 +88,28 @@ def send_qc():
     return bob_bases
     
 def send_basis():
+    global key
     userExecutedMethods.append("send_basis")
-    data = {'type': 'bases', 'bases': alice.process_bases(bob_bases), 'comp_key': alice.get_comparison_key()}
+    data = {'type': 'bases', 'bases': alice.process_bases(bob_bases), 'key': alice.get_comparison_key()}
     socket_send(data, bob_port)
     print("Basis sent to Bob")
+    data = socket_recieve(65430)
+    if alice.comparison_key == data['key']:
+        key = convert_key(alice.get_key())
+        return True
 
 def reset():
+    global key
+    global setupKeyMode
+    global communicationMode
     global userExecutedMethods
     userExecutedMethods = []
     cls()
     print(preamble)
     print(key_menu)
+    key = None
+    setupKeyMode = True
+    communicationMode = False
 
 def send_string():
     str_session = PromptSession()
@@ -103,7 +119,7 @@ def send_string():
         return
     cypher_text, tag, nonce = encrypt(string.encode("ascii"), key)
     data = {'type': 'string', "cypher_text" : cypher_text, "tag" : tag, "nonce" : nonce}
-    socket_send(data)
+    socket_send(data, bob_port)
     print(f"Successfully sent message: {string}")
 
 def send_file():
@@ -117,7 +133,7 @@ def send_file():
     cypher_text, tag, nonce = encrypt(file_text.encode("ascii"), key)
     data = {"type": 'file', 'filename': f'{os.path.split(file_path)[-1]}', "cypher_text": cypher_text, "tag": tag,
             "nonce": nonce}
-    socket_send(data)
+    socket_send(data, bob_port)
     print(f"Successfully sent file: {file_path}")
 
 
@@ -155,16 +171,19 @@ All three lists must be same length and in same order.
 # Keywords are commands
 coms_menu_keywords = ['send_string',
                      'send_file',
-                     'reset']
+                     'reset',
+                     'quit']
 # Description for each command
 coms_menu_description = ['Send an encrypted text string to Bob',
                         'Send an encrypted file to Bob',
-                        'Restart program']
+                        'Restart program',
+                        'Exits the program']
 
 # Method to run when each command is called
 coms_menu_methods = [send_string,
                     send_file,
-                    reset]
+                    reset,
+                    exit]
 
 coms_menu_keyword_to_method = dict(zip(coms_menu_keywords, coms_menu_methods))
 
@@ -174,59 +193,101 @@ for keyword, description in zip(coms_menu_keywords, coms_menu_description):
 
 bob_port = 65433
 
-def main():
-    cls()
-    print(preamble)
-    print(key_menu)
-    setupKeyMode = True
+def accept(sock, mask):
+    conn, addr = sock.accept()
+    print('accepted', conn, 'from', addr)
+    conn.setblocking(False)
+    sel.register(conn, selectors.EVENT_READ, read)
+    
+def read(conn, mask):
+    raw_data = []
+    try:
+        while True:
+            d = conn.recv(1024)
+            if not d:
+                break
+            raw_data.append(d)
+        if raw_data  == []:
+            sel.unregister(conn)
+            conn.close()
+            return
+        data = pickle.loads(b"".join(raw_data))
+        if data['type'] == 'qc':
+            print("Received quantum circuit from Alice")
+            print(data['circuit'])
+        elif data['type'] == 'bases':
+            print("Received bases")
+            print(''.join(str(i) for i in data['bases']))
+        elif data['type'] == 'string':
+            print("Received string")
+            print(decrypt(data['cypher_text'], data['tag'], data['nonce'], key))
+        elif (data['type'] == 'key') | (data['type'] == 'comp_key'):
+            print("Received key")
+            print(data['key'])
+        elif data['type'] == ' file':
+            print("Received file")
+            print(data['file'])
+    except KeyboardInterrupt:
+        print("Exiting...")
+        return
+     
     
 
-    # Configure autocomplete for keywords
-    auto_completer = WordCompleter(key_menu_keywords, ignore_case=True)
-    session = PromptSession(completer=auto_completer)
 
-    while setupKeyMode:
-        try:
-            text = session.prompt('> ')
-        except KeyboardInterrupt:
-            continue
-        except EOFError:
-            break
 
-        try:
-            key_menu_keyword_to_method[text]()
-            if len(userExecutedMethods) == 2:
-                if userExecutedMethods[0] == endSetupKeyModeMethods[0] and userExecutedMethods[1] == endSetupKeyModeMethods[1]:
-                    setupKeyMode = False
-        except KeyError:
-            print("Invalid Input!")
-
-    print("Key setup completed successfully!")
-    key = convert_key(alice.get_key())
-    with Progress() as progress:
-        task1 = progress.add_task("[green]Loading communication mode...", total=50)
-        while not progress.finished:
-            progress.update(task1, advance=0.5)
-            time.sleep(0.04)
-
+def main():
+    global key
     cls()
-    print(preamble)
-    print(coms_menu)
-    communicationMode = True
-    auto_completer = WordCompleter(coms_menu_keywords, ignore_case=True)
-    session = PromptSession(completer=auto_completer)
-    while communicationMode:
-        try:
-            text = session.prompt('> ')
-        except KeyboardInterrupt:
-            continue
-        except EOFError:
-            break
 
-        try:
-            coms_menu_keyword_to_method[text]()
-        except KeyError:
-            print("Invalid Input!")
+    setupKeyMode = True
+    while True:
+        if setupKeyMode:
+            print(preamble)
+            print(key_menu)
+            # Configure autocomplete for keywords
+            auto_completer = WordCompleter(key_menu_keywords, ignore_case=True)
+            session = PromptSession(completer=auto_completer)
+
+            while setupKeyMode:
+                try:
+                    text = session.prompt('> ')
+                except KeyboardInterrupt:
+                    continue
+                except EOFError:
+                    break
+
+                try:
+                    key_menu_keyword_to_method[text]()
+                    if key != None:
+                        setupKeyMode = False
+                except KeyError:
+                    print("Invalid Input!")
+
+            print("Key setup completed successfully!")
+            with Progress() as progress:
+                task1 = progress.add_task("[green]Loading communication mode...", total=50)
+                while not progress.finished:
+                    progress.update(task1, advance=0.5)
+                    time.sleep(0.04)
+        if not setupKeyMode:
+            cls()
+            print(preamble)
+            print(coms_menu)
+            communicationMode = True
+            auto_completer = WordCompleter(coms_menu_keywords, ignore_case=True)
+            session = PromptSession(completer=auto_completer)
+            while communicationMode:
+                try:
+                    text = session.prompt('> ')
+                except KeyboardInterrupt:
+                    continue
+                except EOFError:
+                    break
+
+                try:
+                    coms_menu_keyword_to_method[text]()
+                except KeyError:
+                    print("Invalid Input!")
 
     print('GoodBye!')
 

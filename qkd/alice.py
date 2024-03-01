@@ -31,7 +31,7 @@ class Alice:
                 self.circuit[i].h(0)
                 self.bases.append('H')
             else:
-                self.bases.append('X')
+                self.bases.append('Z')
         if self.verbose:
             print("Bases:", self.bases)
 
@@ -78,7 +78,7 @@ if __name__ == '__main__':
             file.write(value + '\n')
 
     #Random bob circuit for testing
-    bob_bases = ['X' if 0.5 < np.random.random() else 'H' for i in range(5*n)]
+    bob_bases = ['Z' if 0.5 < np.random.random() else 'H' for i in range(5*n)]
     matching_bases = alice.process_bases(bob_bases)
     print(len(matching_bases))
     key_part = alice.get_comparison_key()

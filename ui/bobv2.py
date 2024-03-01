@@ -12,6 +12,7 @@ from qkd.alice import Alice
 from qkd.bob import Bob
 
 key = b'\xb2 \xb9\x0bC\xb9H\x93\xf5\x85U\x84_-\xcc%'
+key = None
 
 bob = None
 alice = None
@@ -19,14 +20,19 @@ alice = None
 bob_bases = None
 
 
+setupKeyMode = True
+communicationMode = False
+
+
 preamble = """
 Running bob.py
 
-You must configure a shared encryption key with Bob before sending files.
-To do this, you must first send a series of quantum bits (as a quantum circuit)
-to Bob. He will then measure these bits, and send back the basis used to measure.
-You then must send Bob the basis you used to generate the bits.
-Once the key setup is complete, you can communicate with Bob.
+You must configure a shared encryption key with Alice before sending files.
+To do this, you must first recieve the quantum circuit from alice.
+You will then measure these bits, and send back the basis used to measure.
+You then confirm which bases encodings match and compare a portion of the key
+to verify unaltered transmission.
+Once the key setup is complete, you can communicate with Alice.
 """
 
 endSetupKeyModeMethods = ['send_basis']
@@ -50,6 +56,7 @@ def socket_send(data):
     s.close()
 
 def send_basis():
+    global key
     userExecutedMethods.append("send_basis")
     data = {'type': 'bases', 'bases': bob.get_bases()}
     socket_send(data)
@@ -63,20 +70,27 @@ def send_basis():
             print("Garbage bits removed")
             print('Comparing to comparison key to verify unaltered transmission')
             time.sleep(1)
-            bob.check_eve(data['comp_key'])
+            if bob.check_eve(data['key']):
+                print('Unaltered transmission verified')
+                socket_send({'type': 'key', 'key': bob.get_comparisonkey()})
             key = convert_key(''.join(str(i) for i in bob.get_key()))
             print('Key successfully created')
+            time.sleep(5)
     except KeyError:
         print("Invalid data received")
-            
-
 
 def reset():
     global userExecutedMethods
+    global key
+    global setupKeyMode
+    global communicationMode
     userExecutedMethods = []
     cls()
     print(preamble)
     print(menu)
+    key = None
+    setupKeyMode = True
+    communicationMode = False
 
 def send_string():
     str_session = PromptSession()
@@ -120,7 +134,7 @@ menu_description = ['Send basis to Alice',
 # Method to run when each command is called
 menu_methods = [send_basis,
                 reset,
-                quit]
+                exit]
 
 menu_keyword_to_method = dict(zip(menu_keywords, menu_methods))
 
@@ -143,49 +157,61 @@ def socket_recieve(port):
     conn.close()
     return pickle.loads(data)
 
+"""
+Setup coms menu. 
+All three lists must be same length and in same order.
+"""
+# Keywords are commands
+coms_menu_keywords = ['send_string',
+                     'send_file',
+                     'reset',
+                     'quit']
+# Description for each command
+coms_menu_description = ['Send an encrypted text string to Bob',
+                        'Send an encrypted file to Bob',
+                        'Restart program',
+                        'Exits the program']
 
+# Method to run when each command is called
+coms_menu_methods = [send_string,
+                    send_file,
+                    reset,
+                    exit]
+
+coms_menu_keyword_to_method = dict(zip(coms_menu_keywords, coms_menu_methods))
+
+coms_menu = f"Communications Menu\n"
+for keyword, description in zip(coms_menu_keywords, coms_menu_description):
+    coms_menu += f"[{keyword}] {description}\n"
+
+def wait_for_qc():
+    print("Waiting for quantum circuit from Alice")
+    data = socket_recieve(65431)
+    if data["type"] == "qc":
+        alice_circuit = data["circuit"]
+        bob = Bob(alice_circuit, verbose=0)
+        print("Quantum circuit received")
+        return bob
 
 def main():
     global bob
-    cls()
-    print(preamble)
-
-    print("Waiting for circuit from Alice")
-
-    alice_answer = socket_recieve(65431)
-    if alice_answer["type"] == "qc":
-        alice_circuit = alice_answer["circuit"]
-        bob = Bob(alice_circuit, verbose=0)
-
-
-    print(menu)
-
-    # Configure autocomplete for keywords
-    auto_completer = WordCompleter(menu_keywords, ignore_case=True)
-    session = PromptSession(completer=auto_completer)
-    setupKeyMode = True
-    while setupKeyMode:
-        try:
-            text = session.prompt('> ')
-        except KeyboardInterrupt:
-            continue
-        except EOFError:
-            break
-
-        try:
-            menu_keyword_to_method[text]()
-            if len(userExecutedMethods) == 1:
-                if userExecutedMethods[0] == endSetupKeyModeMethods[0]:
-                    setupKeyMode = False
-        except KeyError:
-            print("Invalid Input!")
+    global key
+    global setupKeyMode
+    global communicationMode
+    while True:
         cls()
         print(preamble)
-        print(coms_menu)
-        communicationMode = True
-        auto_completer = WordCompleter(coms_menu_keywords, ignore_case=True)
+
+
+        bob = wait_for_qc() 
+
+
+        print(menu)
+
+        # Configure autocomplete for keywords
+        auto_completer = WordCompleter(menu_keywords, ignore_case=True)
         session = PromptSession(completer=auto_completer)
-        while communicationMode:
+        while setupKeyMode:
             try:
                 text = session.prompt('> ')
             except KeyboardInterrupt:
@@ -194,9 +220,31 @@ def main():
                 break
 
             try:
-                coms_menu_keyword_to_method[text]()
+                menu_keyword_to_method[text]()
+                if key != None:
+                    setupKeyMode = False
             except KeyError:
                 print("Invalid Input!")
+        
+        if not setupKeyMode:
+            cls()
+            print(preamble)
+            print(coms_menu)
+            communicationMode = True
+            auto_completer = WordCompleter(coms_menu_keywords, ignore_case=True)
+            session = PromptSession(completer=auto_completer)
+            while communicationMode:
+                try:
+                    text = session.prompt('> ')
+                except KeyboardInterrupt:
+                    continue
+                except EOFError:
+                    break
+
+                try:
+                    coms_menu_keyword_to_method[text]()
+                except KeyError:
+                    print("Invalid Input!")
 
     print('GoodBye!')
 

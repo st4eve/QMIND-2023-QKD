@@ -19,7 +19,7 @@ class Bob():
         
         self.comparisonLength = self.num_qubits//5
         # Create bases for bob
-        self.bases = ['X' if randint(0, 2) else 'H' for i in range(self.num_qubits)]
+        self.bases = ['Z' if randint(0, 2) else 'H' for i in range(self.num_qubits)]
         self.measure_message(self.qc)
         
     def measure_message(self, message):
@@ -32,7 +32,7 @@ class Bob():
         
         for q in range(n):
             # If the base is 0, measure in the Z-basis
-            if self.bases[q] == 'X':
+            if self.bases[q] == 'Z':
                 message[q].measure(0,0)
              # If the base is 1, measure in the X-basis
             if self.bases[q] == 'H':
@@ -87,8 +87,10 @@ class Bob():
         if percentageSame < 99.0:
             print("More than 1% of the qubits did not match. Eve has tampered with the message.")    
             print("Key is not secured")
+            return False
         else:
             print("Key is secured")
+            return True
         
     def get_bases(self):
         return self.bases

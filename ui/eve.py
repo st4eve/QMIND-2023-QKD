@@ -15,7 +15,7 @@ def measure_message(message, bases):
     n = len(message)
     for q in range(n):
         # If the base is 0, measure in the Z-basis
-        if bases[q] == 'X':
+        if bases[q] == 'Z':
             message[q].measure(0,0)
             # If the base is 1, measure in the X-basis
         if bases[q] == 'H':
@@ -34,13 +34,13 @@ def measure_message(message, bases):
 def accept_alice(sock, mask, listening):
     conn, addr = sock.accept()  # Should be ready
     conn.setblocking(False)
-    print("Connected to Alice", conn, "from", addr)
+    print("Intercepted connection from Alice", conn, "from", addr)
     sel.register(conn, selectors.EVENT_READ, process_data_alice)
 
 def accept_bob(sock, mask, listening):
     conn, addr = sock.accept()  # Should be ready
     conn.setblocking(False)
-    print("Connected to Bob", conn, "from", addr)
+    print("Intercepted connection from Bob", conn, "from", addr)
     sel.register(conn, selectors.EVENT_READ, process_data_bob)
 
 def socket_send(data, port):
@@ -59,8 +59,8 @@ def process_data_bob(conn, mask, listen=0):
                 break
             raw_data.append(d)
         if raw_data  == []:
-            # sel.unregister(conn)
-            # conn.close()
+            sel.unregister(conn)
+            conn.close()
             return
         data = pickle.loads(b"".join(raw_data))
         if data['type'] == 'bases':
@@ -71,7 +71,7 @@ def process_data_bob(conn, mask, listen=0):
             print("Received encrypted string")
             print(data['cypher_text'])
             socket_send(data, alice_port)
-        elif data['type'] == 'key':
+        elif (data['type'] == 'key') | (data['type'] == 'comp_key'):
             print("Received key")
             print(data['key'])
             socket_send(data, alice_port)
@@ -93,30 +93,33 @@ def process_data_alice(conn, mask, listening=0):
                 break
             raw_data.append(d)
         if raw_data  == []:
-            # sel.unregister(conn)
-            # conn.close()
+            sel.unregister(conn)
+            conn.close()
             return
         data = pickle.loads(b"".join(raw_data))
         if data["type"] == 'qc':
             print("Received quantum circuit from Alice")
             qc = data['circuit']
             if listening: 
-                eve_bases = ['X' if randint(0, 2) else 'H' for i in range(len(qc))]
+                print('Measuring in random bases')
+                eve_bases = ['Z' if randint(0, 2) else 'H' for i in range(len(qc))]
                 measurements, qc = measure_message(qc, eve_bases)
                 data['qc'] = qc
                 print(measurements)
+            else:
+                print('No measurements')
             print('Sending circuit to bob')
             socket_send(data, bob_port)
             print('Sent, waiting for bases')
         elif data['type'] == 'bases':
             print("Received bases")
-            print(''.join(str(i) for i in data['bases']))
+            print(','.join(str(i) for i in data['bases']))
             socket_send(data, bob_port)
         elif data['type'] == 'string':
             print("Received encrypted string")
             print(data['cypher_text'])
             socket_send(data, bob_port)
-        elif data['type'] == 'key':
+        elif (data['type'] == 'key') | (data['type'] == 'comp_key'):
             print("Received key")
             print(data['key'])
             socket_send(data, bob_port)
@@ -158,12 +161,15 @@ def monitor(listening):
     print("Listening for Communication")
 
     while True:
-        event = sel.select()
-        for key, mask in event:
-            callback = key.data
-            callback(key.fileobj, mask, listening) 
-
-
+        try:
+            event = sel.select()
+            for key, mask in event:
+                callback = key.data
+                callback(key.fileobj, mask, listening) 
+        except KeyboardInterrupt:
+            print("Exiting...")
+            break
+    print('Goodbye!')
 
 if __name__ == "__main__":
     monitor(listening=0)
