@@ -31,7 +31,12 @@ endSetupKeyModeMethods = ['send_qc',
                           'send_basis']
 userExecutedMethods = []
 
-
+def convert_key(key):
+    # Convert binary string to an integer
+    integer_value = int(key, 2)
+    # Convert integer to bytes
+    byte_array = integer_value.to_bytes((len(key) + 7) // 8, byteorder='big')
+    return byte_array
 
 def cls():
     os.system('cls' if os.name == 'nt' else 'clear')
@@ -79,7 +84,7 @@ def send_qc():
     
 def send_basis():
     userExecutedMethods.append("send_basis")
-    data = {'type': 'bases_and_key', 'bases': alice.process_bases(bob_bases), 'comp_key': alice.get_comparison_key()}
+    data = {'type': 'bases', 'bases': alice.process_bases(bob_bases), 'comp_key': alice.get_comparison_key()}
     socket_send(data, bob_port)
     print("Basis sent to Bob")
 
@@ -197,6 +202,7 @@ def main():
             print("Invalid Input!")
 
     print("Key setup completed successfully!")
+    key = convert_key(alice.get_key())
     with Progress() as progress:
         task1 = progress.add_task("[green]Loading communication mode...", total=50)
         while not progress.finished:

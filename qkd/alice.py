@@ -8,8 +8,8 @@ class Alice:
                  n,
                  verbose=0):
         self.n = n
-        self.circuit = [QuantumCircuit(1,1) for i in range(4*n)]
-        self.key = np.random.randint(0, 2, size=4*n)
+        self.circuit = [QuantumCircuit(1,1) for i in range(5*n)]
+        self.key = np.random.randint(0, 2, size=5*n)
         self.bases = []
         self.verbose = verbose
         self.comparison_length = n
@@ -52,18 +52,21 @@ class Alice:
         if self.verbose:
             print("Length of Generated key:", len(self.generated_key))
             print('Generated key:', self.generated_key)
+        self.comparison_key = self.generated_key[:self.comparison_length]
+        self.generated_key = self.generated_key[self.comparison_length:]
+        self.generated_key = self.generated_key[:self.n]
         return self.generated_key
 
     def get_comparison_key(self):
-        self.comparison_key = self.generated_key[:self.comparison_length]
-        self.generated_key = self.generated_key[self.comparison_length:self.n]
         if self.verbose:
             print("Alice Comparison Key:", self.comparison_key)
         return self.comparison_key
-
+    
+    def get_key(self):
+        return ''.join(str(i) for i in self.generated_key)
 
 if __name__ == '__main__':
-    n = 300
+    n = 128
     alice = Alice(n)
     alice.encode_key()
     alice.switch_bases()
@@ -75,8 +78,10 @@ if __name__ == '__main__':
             file.write(value + '\n')
 
     #Random bob circuit for testing
-    bob_bases = ['X' if 0.5 < np.random.random() else 'H' for i in range(n)]
+    bob_bases = ['X' if 0.5 < np.random.random() else 'H' for i in range(5*n)]
     matching_bases = alice.process_bases(bob_bases)
-    key_part = alice.get_comparison_key(np.abs(len(alice.generated_key)-128))
-    print(key_part)
+    print(len(matching_bases))
+    key_part = alice.get_comparison_key()
+    print(len(key_part))
+    print(len(alice.get_key()))
 

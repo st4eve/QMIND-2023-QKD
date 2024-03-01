@@ -15,9 +15,9 @@ class Bob():
         
         # Determines the number of qubits in quantum circuit
         self.num_qubits = len(self.qc) 
-        self.n = self.num_qubits//4
+        self.n = self.num_qubits//5
         
-        self.comparisonLength = self.num_qubits//4
+        self.comparisonLength = self.num_qubits//5
         # Create bases for bob
         self.bases = ['X' if randint(0, 2) else 'H' for i in range(self.num_qubits)]
         self.measure_message(self.qc)
@@ -59,7 +59,8 @@ class Bob():
         
 
         # Stores the key 
-        self.key = kept_bits[self.comparisonLength:self.n]
+        self.key = kept_bits[self.comparisonLength:]
+        self.key = self.key[:self.n]
         
         # Stores the qubits to be compared
         self.comparisonKey = kept_bits[:self.comparisonLength]
@@ -83,8 +84,8 @@ class Bob():
         percentageSame = (sameBases / len(aliceCompareKey)) * 100
         
         # Print message
-        if percentageSame < 75.0:
-            print("More than 25% of the qubits did not match. Eve has tampered with the message.")    
+        if percentageSame < 99.0:
+            print("More than 1% of the qubits did not match. Eve has tampered with the message.")    
             print("Key is not secured")
         else:
             print("Key is secured")
@@ -96,7 +97,7 @@ class Bob():
         return self.bobMeasurement
     
     def get_key(self):
-        return self.key
+        return "".join(str(i) for i in self.key)
     
     def get_comparisonkey(self):
         return self.comparisonKey

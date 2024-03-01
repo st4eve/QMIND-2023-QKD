@@ -32,6 +32,13 @@ Once the key setup is complete, you can communicate with Bob.
 endSetupKeyModeMethods = ['send_basis']
 userExecutedMethods = []
 
+def convert_key(key):
+    # Convert binary string to an integer
+    integer_value = int(key, 2)
+    # Convert integer to bytes
+    byte_array = integer_value.to_bytes((len(key) + 7) // 8, byteorder='big')
+    return byte_array
+
 def cls():
     os.system('cls' if os.name == 'nt' else 'clear')
 
@@ -47,6 +54,22 @@ def send_basis():
     data = {'type': 'bases', 'bases': bob.get_bases()}
     socket_send(data)
     print("Basis sent to Alice")
+    print("Waiting for alice to send correct basis...")
+    data = socket_recieve(65431)
+    try:
+        if data['type'] == 'bases':
+            print("Received correct bases from Alice")
+            bob.remove_garbagebits(data['bases'])
+            print("Garbage bits removed")
+            print('Comparing to comparison key to verify unaltered transmission')
+            time.sleep(1)
+            bob.check_eve(data['comp_key'])
+            key = convert_key(''.join(str(i) for i in bob.get_key()))
+            print('Key successfully created')
+    except KeyError:
+        print("Invalid data received")
+            
+
 
 def reset():
     global userExecutedMethods
@@ -156,7 +179,26 @@ def main():
                     setupKeyMode = False
         except KeyError:
             print("Invalid Input!")
+        cls()
+        print(preamble)
+        print(coms_menu)
+        communicationMode = True
+        auto_completer = WordCompleter(coms_menu_keywords, ignore_case=True)
+        session = PromptSession(completer=auto_completer)
+        while communicationMode:
+            try:
+                text = session.prompt('> ')
+            except KeyboardInterrupt:
+                continue
+            except EOFError:
+                break
 
+            try:
+                coms_menu_keyword_to_method[text]()
+            except KeyError:
+                print("Invalid Input!")
+
+    print('GoodBye!')
 
 if __name__ == '__main__':
     main()
