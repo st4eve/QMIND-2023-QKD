@@ -14,6 +14,7 @@ from qkd.bob import Bob
 key = b'\xb2 \xb9\x0bC\xb9H\x93\xf5\x85U\x84_-\xcc%'
 
 bob = None
+alice = None
 
 bob_bases = None
 
@@ -36,15 +37,16 @@ def cls():
 
 def socket_send(data):
     s = socket.socket()
+    s.settimeout(20)
     s.connect(('localhost', 65432))
     s.sendall(pickle.dumps(data))
     s.close()
 
 def send_basis():
     userExecutedMethods.append("send_basis")
-    data = {'type': 'bases_and_key', 'bases': alice.process_bases(bob_bases), 'comp_key': alice.get_comparison_key()}
+    data = {'type': 'bases', 'bases': bob.get_bases()}
     socket_send(data)
-    print("Basis sent to Bob")
+    print("Basis sent to Alice")
 
 def reset():
     global userExecutedMethods
@@ -85,20 +87,38 @@ All three lists must be same length and in same order.
 """
 # Keywords are commands
 menu_keywords = ['send_basis',
-                 'reset']
+                 'reset',
+                 'quit']
 # Description for each command
 menu_description = ['Send basis to Alice',
-                    'Restart program']
+                    'Restart program',
+                    'Exits the program']
 
 # Method to run when each command is called
 menu_methods = [send_basis,
-                reset]
+                reset,
+                quit]
 
 menu_keyword_to_method = dict(zip(menu_keywords, menu_methods))
 
 menu = f"Menu\n"
 for keyword, description in zip(menu_keywords, menu_description):
     menu += f"[{keyword}] {description}\n"
+
+def socket_recieve(port):
+    s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    s.bind(('localhost', port))
+    s.listen()
+    conn, addr = s.accept()
+    data = []
+    while True:
+        d = conn.recv(1024)
+        if not d:
+            break
+        data.append(d)
+    data = b"".join(data)
+    conn.close()
+    return pickle.loads(data)
 
 
 
@@ -108,25 +128,12 @@ def main():
     print(preamble)
 
     print("Waiting for circuit from Alice")
-    s = socket.socket()
-    s.bind(('localhost', 65432))
-    s.listen()
-    conn, addr = s.accept()
-    with conn:
-        print(f"Connected by {addr}")
-        raw_data = []
-        try:
-            while True:
-                d = conn.recv(1024)
-                if not d:
-                    break
-                raw_data.append(d)
-            alice_answer = pickle.loads(b"".join(raw_data))
-            if alice_answer["type"] == "qc":
-                alice_circuit = alice_answer["circuit"]
-                bob = Bob(alice_circuit, verbose=0)
-        except KeyboardInterrupt:
-            print("Exiting...")
+
+    alice_answer = socket_recieve(65431)
+    if alice_answer["type"] == "qc":
+        alice_circuit = alice_answer["circuit"]
+        bob = Bob(alice_circuit, verbose=0)
+
 
     print(menu)
 
@@ -150,7 +157,6 @@ def main():
         except KeyError:
             print("Invalid Input!")
 
-    print('GoodBye!')
 
 if __name__ == '__main__':
     main()
