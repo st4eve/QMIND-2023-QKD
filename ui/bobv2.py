@@ -1,4 +1,6 @@
 import pickle
+import selectors
+import multiprocessing
 import time
 import socket
 
@@ -7,9 +9,10 @@ from prompt_toolkit.completion import WordCompleter
 from rich.progress import Progress
 import os
 
-from encryption.aes_encryption import encrypt
+from encryption.aes_encryption import encrypt, decrypt
 from qkd.alice import Alice
 from qkd.bob import Bob
+import multiprocessing
 
 key = b'\xb2 \xb9\x0bC\xb9H\x93\xf5\x85U\x84_-\xcc%'
 key = None
@@ -70,12 +73,18 @@ def send_basis():
             print("Garbage bits removed")
             print('Comparing to comparison key to verify unaltered transmission')
             time.sleep(1)
+            socket_send({'type': 'key', 'key': bob.get_comparisonkey()})
             if bob.check_eve(data['key']):
                 print('Unaltered transmission verified')
-                socket_send({'type': 'key', 'key': bob.get_comparisonkey()})
-            key = convert_key(''.join(str(i) for i in bob.get_key()))
-            print('Key successfully created')
-            time.sleep(5)
+                key = convert_key(''.join(str(i) for i in bob.get_key()))
+                print('Key successfully created')
+                time.sleep(5)
+            else:
+                print('Key comparison failed, someone is listening to this channel')
+                print('Restarting key generation protocol')
+                time.sleep(5)
+                reset()
+                return
     except KeyError:
         print("Invalid data received")
 
@@ -84,6 +93,7 @@ def reset():
     global key
     global setupKeyMode
     global communicationMode
+    global thread
     userExecutedMethods = []
     cls()
     print(preamble)
@@ -91,6 +101,10 @@ def reset():
     key = None
     setupKeyMode = True
     communicationMode = False
+    if thread != None:
+        thread.kill()
+        thread = multiprocessing.Process(target=check_com)
+        sel.close()
 
 def send_string():
     str_session = PromptSession()
@@ -176,7 +190,7 @@ coms_menu_description = ['Send an encrypted text string to Bob',
 coms_menu_methods = [send_string,
                     send_file,
                     reset,
-                    exit]
+                    quit]
 
 coms_menu_keyword_to_method = dict(zip(coms_menu_keywords, coms_menu_methods))
 
@@ -193,47 +207,91 @@ def wait_for_qc():
         print("Quantum circuit received")
         return bob
 
+def quit():
+    thread.kill()
+    sel.close()
+    exit()
+
+def accept(sock, mask):
+    conn, addr = sock.accept()
+    conn.setblocking(False)
+    sel.register(conn, selectors.EVENT_READ, read)
+    
+def read(conn, mask):
+    raw_data = []
+    try:
+        while True:
+            d = conn.recv(1024)
+            if not d:
+                break
+            raw_data.append(d)
+        if raw_data  == []:
+            sel.unregister(conn)
+            conn.close()
+            return
+        data = pickle.loads(b"".join(raw_data))
+        print('\n')
+        if data['type'] == 'qc':
+            print("Received quantum circuit from Alice")
+            print(data['circuit'])
+        elif data['type'] == 'bases':
+            print("Received bases")
+            print(''.join(str(i) for i in data['bases']))
+        elif data['type'] == 'string':
+            print("Received string")
+            print(decrypt(data['cypher_text'], data['tag'], data['nonce'], key))
+        elif (data['type'] == 'key') | (data['type'] == 'comp_key'):
+            print("Received key")
+            print(data['key'])
+        elif data['type'] == 'file':
+            print("Received file")
+            print(decrypt(data['cypher_text'], data['tag'], data['nonce'], key))
+        print('\n')
+    except KeyboardInterrupt:
+        print("Exiting...")
+        return
+     
+def check_com():
+    s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    s.bind(('localhost', recieve_port))
+    s.listen()
+    
+    sel.register(s, selectors.EVENT_READ, accept)
+
+    while True:
+        events = sel.select()
+        for key, mask in events:
+            callback = key.data
+            callback(key.fileobj, mask)   
+
+
+sel = selectors.DefaultSelector()
+bob_port = 65433
+recieve_port = 65431
+thread = multiprocessing.Process(target=check_com)
+
+
+
 def main():
     global bob
     global key
     global setupKeyMode
     global communicationMode
     while True:
-        cls()
-        print(preamble)
-
-
-        bob = wait_for_qc() 
-
-
-        print(menu)
-
-        # Configure autocomplete for keywords
-        auto_completer = WordCompleter(menu_keywords, ignore_case=True)
-        session = PromptSession(completer=auto_completer)
-        while setupKeyMode:
-            try:
-                text = session.prompt('> ')
-            except KeyboardInterrupt:
-                continue
-            except EOFError:
-                break
-
-            try:
-                menu_keyword_to_method[text]()
-                if key != None:
-                    setupKeyMode = False
-            except KeyError:
-                print("Invalid Input!")
-        
-        if not setupKeyMode:
+        if setupKeyMode:
             cls()
             print(preamble)
-            print(coms_menu)
-            communicationMode = True
-            auto_completer = WordCompleter(coms_menu_keywords, ignore_case=True)
+
+
+            bob = wait_for_qc() 
+
+
+            print(menu)
+
+            # Configure autocomplete for keywords
+            auto_completer = WordCompleter(menu_keywords, ignore_case=True)
             session = PromptSession(completer=auto_completer)
-            while communicationMode:
+            while setupKeyMode:
                 try:
                     text = session.prompt('> ')
                 except KeyboardInterrupt:
@@ -242,6 +300,32 @@ def main():
                     break
 
                 try:
+                    if text == '':
+                        continue
+                    menu_keyword_to_method[text]()
+                    if key != None:
+                        setupKeyMode = False
+                except KeyError:
+                    print("Invalid Input!")
+        
+        if not setupKeyMode:
+            cls()
+            print('Now setup for communication')
+            print(coms_menu)
+            communicationMode = True
+            auto_completer = WordCompleter(coms_menu_keywords, ignore_case=True)
+            session = PromptSession(completer=auto_completer)
+            thread.start()
+            while communicationMode:
+                try:
+                    text = session.prompt('> ')
+                except KeyboardInterrupt:
+                    continue
+                except EOFError:
+                    break
+                try:
+                    if text == '':
+                        continue
                     coms_menu_keyword_to_method[text]()
                 except KeyError:
                     print("Invalid Input!")

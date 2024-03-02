@@ -3,8 +3,8 @@ import pickle
 from numpy.random import randint
 from qiskit import QuantumCircuit
 from qiskit_aer import AerSimulator
-import threading
 import selectors
+import click
 
 
 def measure_message(message, bases):
@@ -75,9 +75,9 @@ def process_data_bob(conn, mask, listen=0):
             print("Received key")
             print(data['key'])
             socket_send(data, alice_port)
-        elif data['type'] == ' file':
+        elif data['type'] == 'file':
             print("Received file")
-            print(data['file'])
+            print(data['cypher_text'])
             socket_send(data, alice_port)
         
     except KeyboardInterrupt:
@@ -123,9 +123,9 @@ def process_data_alice(conn, mask, listening=0):
             print("Received key")
             print(data['key'])
             socket_send(data, bob_port)
-        elif data['type'] == ' file':
+        elif data['type'] == 'file':
             print("Received file")
-            print(data['file'])
+            print(data['cypher_text'])
             socket_send(data, bob_port)
         
     except KeyboardInterrupt:
@@ -144,6 +144,8 @@ bob = socket.socket()
 alice_port = 65430
 bob_port = 65431
 
+@click.command()
+@click.option("--listening", default=0, help="Whether to measure the QC")
 def monitor(listening):
     print(f"Monitoring communication between Alice and Bob")
     alice.bind(('localhost', 65433))
@@ -158,7 +160,8 @@ def monitor(listening):
 
     sel.register(alice, selectors.EVENT_READ, accept_alice) 
     sel.register(bob, selectors.EVENT_READ, accept_bob)
-    print("Listening for Communication")
+    if listening:
+        print("Listening for Communication")
 
     while True:
         try:
@@ -172,4 +175,4 @@ def monitor(listening):
     print('Goodbye!')
 
 if __name__ == "__main__":
-    monitor(listening=0)
+    monitor()
